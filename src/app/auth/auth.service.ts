@@ -17,6 +17,7 @@ import { Subscription } from 'rxjs';
 })
 export class AuthService {
   private subscription:Subscription = new Subscription()
+  private usuario:User
   constructor(private afAuth:AngularFireAuth, private router:Router, private afDB:AngularFirestore, private store:Store<AppState>) { }
   crearUsuario(nombre:string, email:string, pasword:string){
     this.store.dispatch(new ActivarLoadingAction())
@@ -51,8 +52,10 @@ export class AuthService {
         this.subscription = this.afDB.doc(`${fbuser.uid}/usuario`).valueChanges().subscribe((usuario:any)=>{
           const newUser = new User(usuario)
           this.store.dispatch(new SetUserAction(newUser))
+          this.usuario = newUser
         })
       } else {
+        this.usuario = null
         this.subscription.unsubscribe()
       }
       
@@ -90,5 +93,10 @@ export class AuthService {
       })
     )
   }
+
+  getUsuario(){
+    return {...this.usuario}
+  }
+
 
 }
